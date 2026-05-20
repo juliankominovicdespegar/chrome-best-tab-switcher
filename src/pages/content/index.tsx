@@ -1,20 +1,31 @@
-import { createRoot } from 'react-dom/client';
-import './style.css' 
-const div = document.createElement('div');
-div.id = '__root';
-document.body.appendChild(div);
+import { createRoot, type Root } from 'react-dom/client';
+import styles from './styles.css?inline';
+import App from './App';
 
-const rootContainer = document.querySelector('#__root');
-if (!rootContainer) throw new Error("Can't find Content root element");
-const root = createRoot(rootContainer);
-root.render(
-  <div className='absolute bottom-0 left-0 text-lg text-black bg-amber-400 z-50'  >
-    content script <span className='your-class'>loaded</span>
-  </div>
-);
+const HOST_ID = 'best-tab-switcher-host';
 
-try {
-  console.log('content script loaded');
-} catch (e) {
-  console.error(e);
+let hostEl: HTMLDivElement | null = null;
+let reactRoot: Root | null = null;
+
+function mount() {
+  if (hostEl) return;
+
+  hostEl = document.createElement('div');
+  hostEl.id = HOST_ID;
+  hostEl.style.cssText =
+    'position:fixed;inset:0;z-index:2147483647;pointer-events:none;';
+  document.documentElement.appendChild(hostEl);
+
+  const shadow = hostEl.attachShadow({ mode: 'open' });
+  const styleSheet = new CSSStyleSheet();
+  styleSheet.replaceSync(styles);
+  shadow.adoptedStyleSheets = [styleSheet];
+
+  const mountPoint = document.createElement('div');
+  shadow.appendChild(mountPoint);
+
+  reactRoot = createRoot(mountPoint);
+  reactRoot.render(<App />);
 }
+
+mount();

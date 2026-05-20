@@ -1,24 +1,15 @@
-import React from 'react';
-import logo from '@assets/img/logo.svg';
-
 export default function Popup() {
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800">
-      <header className="flex flex-col items-center justify-center text-white">
-        <img src={logo} className="h-36 pointer-events-none animate-spin-slow" alt="logo" />
-        <p>
-          Edit <code>src/pages/popup/Popup.jsx</code> and save to reload.
-        </p>
-        <a
-          className="text-blue-400"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
-        <p>Popup styled with TailwindCSS!</p>
-      </header>
+    <div className="w-[280px] p-4 text-sm text-neutral-200 bg-neutral-900">
+      <p className="font-medium mb-2">Best Tab Switcher</p>
+      <p className="text-neutral-400 leading-relaxed">
+        Press <kbd className="px-1 py-0.5 rounded bg-neutral-800 text-neutral-200">Ctrl+Shift+K</kbd> on
+        any page to open the switcher.
+      </p>
+      <p className="text-neutral-500 mt-3 text-xs">
+        If the shortcut conflicts with Chrome, rebind it at{' '}
+        <span className="text-neutral-400">chrome://extensions/shortcuts</span>
+      </p>
     </div>
   );
 }
