@@ -1,3 +1,8 @@
+import {
+  ExtensionContextInvalidatedError,
+  isExtensionContextValid,
+} from '@src/lib/extensionContext';
+
 export type TabItem = {
   id: number;
   windowId: number;
@@ -10,6 +15,7 @@ export type TabItem = {
 };
 
 export type RecentlyClosedItem = {
+  id: string;
   sessionId: string;
   title: string;
   url: string;
@@ -44,26 +50,46 @@ export type BackgroundResponse =
   | { type: 'GET_SCREENSHOT'; screenshot?: string }
   | { type: 'ERROR'; message: string };
 
-export type ContentMessage = { type: 'TOGGLE_SWITCHER' };
+export type ContentMessage = { type: 'TOGGLE_SWITCHER' } | { type: 'PING' };
+
+export type ContentResponse = { type: 'PONG' };
 
 export function sendToBackground<T extends BackgroundResponse>(
   request: BackgroundRequest,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(request, (response: T | undefined) => {
-      if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message));
-        return;
-      }
-      if (!response) {
-        reject(new Error('No response from background'));
-        return;
-      }
-      if (response.type === 'ERROR') {
-        reject(new Error(response.message));
-        return;
-      }
-      resolve(response);
-    });
+    if (!isExtensionContextValid()) {
+      reject(new ExtensionContextInvalidatedError());
+      return;
+    }
+
+    try {
+      chrome.runtime.sendMessage(request, (response: T | undefined) => {
+        if (chrome.runtime.lastError) {
+          const msg = chrome.runtime.lastError.message ?? 'Unknown runtime error';
+          reject(
+            msg.includes('Extension context invalidated')
+              ? new ExtensionContextInvalidatedError()
+              : new Error(msg),
+          );
+          return;
+        }
+        if (!response) {
+          reject(new Error('No response from background'));
+          return;
+        }
+        if (response.type === 'ERROR') {
+          reject(new Error(response.message));
+          return;
+        }
+        resolve(response);
+      });
+    } catch (error) {
+      reject(
+        error instanceof Error && error.message.includes('Extension context invalidated')
+          ? new ExtensionContextInvalidatedError()
+          : error,
+      );
+    }
   });
 }

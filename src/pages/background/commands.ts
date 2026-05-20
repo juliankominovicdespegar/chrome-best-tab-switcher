@@ -1,3 +1,4 @@
+import { ensureContentScriptAndSend, isRestrictedTabUrl } from '@src/lib/contentScript';
 import type { ContentMessage } from '@src/lib/messages';
 
 export function initCommands() {
@@ -7,11 +8,15 @@ export function initCommands() {
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!activeTab?.id) return;
 
+    if (isRestrictedTabUrl(activeTab.url)) {
+      console.warn('[tab-switcher] Cannot open on restricted page:', activeTab.url);
+      return;
+    }
+
     const message: ContentMessage = { type: 'TOGGLE_SWITCHER' };
-    try {
-      await chrome.tabs.sendMessage(activeTab.id, message);
-    } catch (err) {
-      console.warn('[tab-switcher] Cannot open on this page:', err);
+    const ok = await ensureContentScriptAndSend(activeTab.id, message);
+    if (!ok) {
+      console.warn('[tab-switcher] Failed to open switcher on tab', activeTab.id);
     }
   });
 }

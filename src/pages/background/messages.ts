@@ -31,9 +31,10 @@ async function listRecentlyClosed(): Promise<RecentlyClosedItem[]> {
   const sessions = await chrome.sessions.getRecentlyClosed({ maxResults: 25 });
   const items: RecentlyClosedItem[] = [];
 
-  for (const session of sessions) {
+  for (const [index, session] of sessions.entries()) {
     if (session.tab) {
       items.push({
+        id: `${session.sessionId}-${index}`,
         sessionId: session.sessionId,
         title: session.tab.title || 'Untitled',
         url: session.tab.url || '',
