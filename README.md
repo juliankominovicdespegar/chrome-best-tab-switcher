@@ -1,275 +1,181 @@
 <div align="center">
+<img src="public/icon-128.png" alt="logo"/>
+<h1> Minimalist Chrome/Firefox Extension Boilerplate with<br/>React + Vite + TypeScript + TailwindCSS</h1>
 
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/99cb6303-64e4-4bed-bf3f-35735353e6de" />
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/a5dbf71c-c509-4c4f-80f4-be88a1943b0a" />
-    <img alt="Logo" src="https://github.com/user-attachments/assets/99cb6303-64e4-4bed-bf3f-35735353e6de" />
-</picture>
+<h5>
+This template repository is a side product of my Chrome Extension <a target="_blank" rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/supatabs/icbcnjlaegndjabnjbaeihnnmidbfigk">Supatabs</a>.
+<br />
+If you tend to have tons of tabs open, or are a OneTab user, make sure to check it out <a target="_blank" rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/supatabs/icbcnjlaegndjabnjbaeihnnmidbfigk">here</a>!
+</h5>
 
-![](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
-![](https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![](https://badges.aleen42.com/src/vitejs.svg)
-
-![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/build-zip.yml/badge.svg)
-![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/lint.yml/badge.svg)
-
-<a href="https://discord.gg/4ERQ6jgV9a" target="_blank"><img src="https://discord.com/api/guilds/1263404974830915637/widget.png"/></a>
-
-> This boilerplate
-> has [Legacy version](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/tree/legacy)
+<h5>Supatabs is an example and showcase of what you can develop with this template. (anything you want, really 🚀)</h5>
 
 </div>
-
-> [!NOTE]
-> This project is listed in the [Awesome Vite](https://github.com/vitejs/awesome-vite)
-
-> [!TIP]
-> Share storage state between all pages
->
-> https://github.com/user-attachments/assets/3b8e189f-6443-490e-a455-4f9570267f8c
 
 ## Table of Contents
 
 - [Intro](#intro)
 - [Features](#features)
-- [Structure](#structure)
-    - [ChromeExtension](#structure-chrome-extension)
-    - [Packages](#structure-packages)
-    - [Pages](#structure-pages)
-- [Installation](#installation)
-    - [Chrome](#installation-chrome)
-    - [Firefox](#installation-firefox)
-- [Install dependency](#install-dependency)
-    - [For root](#install-dependency-for-root)
-    - [For module](#install-dependency-for-module)
-- [Environment variables](#env-variables)
-    - [Add new](#env-variables-new)
-    - [Set via CLI](#env-variables-cli-set)
-- [Troubleshooting](#troubleshooting)
-    - [Hot module reload seems to have frozen](#hot-module-reload-seems-to-have-frozen)
-    - [Imports not resolving correctly](#imports-not-resolving-correctly)
-- [Community](#community)
-- [Debugging](#debugging)
-- [Reference](#reference)
-- [Star History](#star-history)
-- [Contributors](#contributors)
+- [Usage](#usage)
+  - [Getting Started](#gettingStarted) 
+  - [Customization](#customization)
+  - [Publish](#publish)
+- [Tech Docs](#tech)
+- [Credit](#credit)
+- [Contributing](#contributing)
 
-## Intro
 
-This boilerplate helps you create Chrome/Firefox extensions using React and Typescript. It improves
-the build speed and development experience by using Vite and Turborepo.
+## Intro <a name="intro"></a>
+This boilerplate is meant to be a minimal quick start for creating chrome/firefox extensions using React, Typescript and Tailwind CSS.
 
-## Features
+It includes all possible pages such as **new tab**, **dev panel**, **pop up**, etc., as well as corresponding manifest settings by default.
+You will likely have to customize/delete some of the pages (see docs below).
 
-- [React](https://reactjs.org/)
+You can build dist files for both Chrome and Firefox with manifest v3.
+
+If you are looking for a React focused way to access the local storage, I also implemented a chrome local/sync storage hook. The hook works
+well with this template. [Check it out here](https://gist.github.com/JohnBra/c81451ea7bc9e77f8021beb4f198ab96).
+
+## Features <a name="features"></a>
+- [React 19](https://reactjs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
-- [Tailwindcss](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/) with [Rollup](https://rollupjs.org/)
-- [Turborepo](https://turbo.build/repo)
-- [Prettier](https://prettier.io/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [i18n (optional)](https://developer.chrome.com/docs/extensions/reference/api/i18n)
+- [Cross browser development with polyfill (optional)](https://github.com/mozilla/webextension-polyfill?tab=readme-ov-file#basic-setup-with-module-bundlers)
 - [ESLint](https://eslint.org/)
-- [Chrome Extensions Manifest Version 3](https://developer.chrome.com/docs/extensions/mv3/intro/)
-- [Custom i18n package](/packages/i18n/)
-- [Custom HMR (Hot Module Rebuild) plugin](/packages/hmr)
-- [End-to-end testing with WebdriverIO](https://webdriver.io/)
+- [Chrome Extension Manifest Version 3](https://developer.chrome.com/docs/extensions/mv3/intro/)
+- [Github Action](https://github.com/JohnBra/vite-web-extension/actions/workflows/ci.yml) to build and zip your extension (manual trigger)
 
-## Installation
+## Usage <a name="usage"></a>
 
-1. Clone this repository.( ```git clone https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite``` )
-2. Ensure your node version is >= than in `.nvmrc` file, recommend to use [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#intro)
-3. Edit `/packages/i18n/locales/`{your locale(s)}/`messages.json`
-4. In the objects `extensionDescription` and `extensionName`, change the `message` fields (leave `description` alone)
-5. Install pnpm globally: `npm install -g pnpm`
-6. Run `pnpm install`
-7. Check if you have that configuration in your IDE/Editor:
-    - <b>VS Code</b>:
-        - Installed [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-        - Installed [Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-        - Enabled `Typescript Workbench version` in settings:
-            - CTRL + SHIFT + P -> Search: `Typescript: Select Typescript version...` -> `Use Workbench version`
-            - [Read more](https://code.visualstudio.com/docs/languages/typescript#_using-newer-typescript-versions)
-        - Optional, for imports to work correctly in WSL, you might need to install the [Remote - WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) extension and connect to WSL remotely from VS Code. See overview section in the extension page for more information.
-    - <b>WebStorm</b>:
-      - Configured [ESLint](https://www.jetbrains.com/help/webstorm/eslint.html#ws_eslint_configure_run_eslint_on_save)
-      - Configured [Prettier](https://prettier.io/docs/en/webstorm.html)
-      - Optional, but useful `File | Settings | Tools | Actions on Save`\
-      -> `Optimize imports` and `Reformat code`
-8. Run `pnpm update-version <version>` for change the `version` to the desired version of your extension.
+### Getting Started <a name="gettingStarted"></a>
 
-> [!IMPORTANT]
-> On Windows, make sure you have WSL enabled and Linux distribution (e.g. Ubuntu) installed on WSL.
-> 
-> [Installation Guide](https://learn.microsoft.com/en-us/windows/wsl/install)
+#### Developing and building
+This template comes with build configs for both Chrome and Firefox. Running
+`dev` or `build` commands without specifying the browser target will build
+for Chrome by default.
 
-<b>Then, depending on the target browser:</b>
+1. Clone this repository or click "Use this template"
+2. Change `name` and `description` in `manifest.json`
+3. Run `yarn` or `npm i` (check your node version >= 16)
+4. Run `yarn dev[:chrome|:firefox]`, or `npm run dev[:chrome|:firefox]`
 
-### For Chrome: <a name="installation-chrome"></a>
+Running a `dev` command will build your extension and watch for changes in the 
+source files. Changing the source files will refresh the corresponding 
+`dist_<chrome|firefox>` folder.
 
-1. Run:
-    - Dev: `pnpm dev` (on Windows, you should run as administrator;
-      see [issue#456](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/issues/456))
-    - Prod: `pnpm build`
-2. Open in browser - `chrome://extensions`
-3. Check - <kbd>Developer mode</kbd>
-4. Click - <kbd>Load unpacked</kbd> in the upper left corner
-5. Select the `dist` directory from the boilerplate project
+To create an optimized production build, run `yarn build[:chrome|:firefox]`, or
+`npm run build[:chrome|:firefox]`.
 
-### For Firefox: <a name="installation-firefox"></a>
+#### Load your extension
+For Chrome
+1. Open - Chrome browser
+2. Access - [chrome://extensions](chrome://extensions)
+3. Tick - Developer mode
+4. Find - Load unpacked extension
+5. Select - `dist_chrome` folder in this project (after dev or build)
 
-1. Run:
-    - Dev: `pnpm dev:firefox`
-    - Prod: `pnpm build:firefox`
-2. Open in browser - `about:debugging#/runtime/this-firefox`
-3. Click - <kbd>Load Temporary Add-on...</kbd> in the upper right corner
-4. Select the `./dist/manifest.json` file from the boilerplate project
+For Firefox
+1. Open - Firefox browser
+2. Access - [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
+3. Click - Load temporary Add-on
+4. Select - any file in `dist_firefox` folder (i.e. `manifest.json`) in this project (after dev or build)
 
-> [!NOTE]
-> In Firefox, you load add-ons in temporary mode. That means they'll disappear after each browser close. You have to
-> load the add-on on every browser launch.
+### Customization <a name="customization"></a>
 
-## Install dependency for turborepo: <a name="install-dependency"></a>
+#### Adding / removing pages
+The template includes source code for **all** of the extension pages (i.e. New Tab, Dev Tools, Popup, Side Panel
+etc.). You will likely have to customize it to fit your needs.
 
-### For root: <a name="install-dependency-for-root"></a>
+E.g. you don't want the newtab page to activate whenever you open a new tab:
+1. remove the directory `newtab` and its contents in `src/pages`
+2. remove `chrome_url_overrides: { newtab: 'src/pages/newtab/index.html' },` in `manifest.json`
 
-1. Run `pnpm i <package> -w`
+Some pages like the "Side Panel" don't work the exact same in Chrome and Firefox. While this template includes
+the source code for the side panel, it won't automatically be included in the dist file to prevent cross browser
+build warnings.
 
-### For module: <a name="install-dependency-for-module"></a>
+To include the side panel for Chrome add the following to the `manifest.json`:
 
-1. Run `pnpm i <package> -F <module name>`
+```typescript
+{
+  "manifest_version": 3,
+  // ...
+  "permissions": [
+    "activeTab",
+    "sidePanel" // <-- permission for sidepanel
+  ],
+  // ...
+  "side_panel": {
+    "default_path": "src/pages/panel/index.html" // <-- tell vite to include it in the build files
+  },
+  // ...
+}
+```
 
-`package` - Name of the package you want to install e.g. `nodemon` \
-`module-name` - You can find it inside each `package.json` under the key `name`, e.g. `@extension/content-script`, you
-can use only `content-script` without `@extension/` prefix
+If you need to declare pages in addition to the manifest pages, e.g. a custom `app` page, create a 
+new folder in the `pages` directory and add the corresponding `.html`, `.tsx` and `.css` 
+files (see `options/*` for an example to copy). Then include the root html in the `vite.config.base.ts` 
+file under `build.rollupOptions.input` like so:
 
-## How do I disable modules I'm not using?
+```typescript
+// ...
+build: {
+   rollupOptions: {
+      input: {
+         app: resolve(pagesDir, "app", "index.html"),
+      },
+      output: {
+         entryFileNames: (chunk) => `src/pages/${chunk.name}/index.js`,
+      },
+   },
+}
+// ...
+```
 
-[Read here](packages/module-manager/README.md)
+#### Styling
+CSS files in the `src/pages/*` directories are not necessary. They are left in there in case you want 
+to use it in combination with Tailwind CSS. **Feel free to delete them**.
 
-## Environment variables
+Tailwind can be configured, themed and extended according to the [docs](https://tailwindcss.com/docs/theme).
 
-Read: [Env Documentation](packages/env/README.md)
+#### Internationalization (i18n)
+To enable internationalization set the `localize` flag in the `vite.config.base.ts` to `true`.
 
-## Boilerplate structure <a name="structure"></a>
+The template includes a directory `locales` with a basic setup for english i18n. Enabling i18n
+will pull the name and description for your extension from the english translation files instead
+of the manifest.
 
-### Chrome extension <a name="structure-chrome-extension"></a>
+Follow the instructions in the [official docs](https://developer.chrome.com/docs/extensions/reference/api/i18n#description) 
+to add other translations and retrieve them in the extension.
 
-The extension lives in the `chrome-extension` directory and includes the following files:
+If you don't need i18n you can ignore the `locales` directory until you need it, as it won't
+be copied into the build folder unless the `localize` flag is set to `true`.
 
-- [`manifest.ts`](chrome-extension/manifest.ts) - script that outputs the `manifest.json`
-- [`src/background`](chrome-extension/src/background) - [background script](https://developer.chrome.com/docs/extensions/mv3/background_pages/)
-  (`background.service_worker` in manifest.json)
-- [`public`](chrome-extension/public/) - icons referenced in the manifest; content CSS for user's page injection
+### Publish your extension to the CWS<a name="publish"></a>
+To upload an extension to the Chrome store you have to pack (zip) it and then upload it to your item 
+in the Chrome Web Store.
 
-> [!IMPORTANT]
-> To facilitate development, the boilerplate is configured to "Read and change all your data on all websites".
-> In production, it's best practice to limit the premissions to only the strictly necessary websites. See
-> [Declaring permissions](https://developer.chrome.com/docs/extensions/develop/concepts/declare-permissions)
-> and edit `manifest.js` accordingly.
+This repo includes a Github Action Workflow to create a 
+[optimized prod build and the zip file](https://github.com/JohnBra/vite-web-extension/actions/workflows/ci.yml).
 
-### Pages <a name="structure-pages"></a>
+To run the workflow do the following:
+1. Go to the **"Actions"** tab in your forked repository from this template
+2. In the left sidebar click on **"Build and Zip Chrome Extension"**
+3. Click on **"Run Workflow"** and select the main branch, then **"Run Workflow"**
+4. Refresh the page and click the most recent run
+5. In the summary page **"Artifacts"** section click on the generated **"vite-web-extension-chrome"**
+6. Upload this file to the Chrome Web Store as described [here](https://developer.chrome.com/docs/webstore/publish/)
 
-Code that is transpiled to be part of the extension lives in the [pages](pages) directory.
-
-- [`content`](pages/content) - Scripts injected into specified pages (You can see it in console)
-- [`content-ui`](pages/content-ui) - React Components injected into specified pages (You can see it at the very bottom of pages)
-- [`content-runtime`](pages/content-runtime/src/) - [injected content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts#functionality)
-  This can be injected from e.g. `popup` like standard `content`
-- [`devtools`](pages/devtools/) - [extend the browser DevTools](https://developer.chrome.com/docs/extensions/how-to/devtools/extend-devtools#creating)
-  (`devtools_page` in manifest.json)
-- [`devtools-panel`](pages/devtools-panel/) - [DevTools panel](https://developer.chrome.com/docs/extensions/reference/api/devtools/panels)
-  for [devtools](pages/devtools/src/index.ts)
-- [`new-tab`](pages/new-tab/) - [override the default New Tab page](https://developer.chrome.com/docs/extensions/develop/ui/override-chrome-pages)
-  (`chrome_url_overrides.newtab` in manifest.json)
-- [`options`](pages/options/) - [options page](https://developer.chrome.com/docs/extensions/develop/ui/options-page)
-  (`options_page` in manifest.json)
-- [`popup`](pages/popup/) - [popup](https://developer.chrome.com/docs/extensions/reference/api/action#popup) shown when
-  clicking the extension in the toolbar
-  (`action.default_popup` in manifest.json)
-- [`side-panel`](pages/side-panel/) - [sidepanel (Chrome 114+)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
-  (`side_panel.default_path` in manifest.json)
-
-### Packages <a name="structure-packages"></a>
-
-Some shared packages:
-
-- `dev-utils` - utilities for Chrome extension development (manifest-parser, logger)
-- `env` - exports object which contain all environment variables from `.env` and dynamically declared
-- `hmr` - custom HMR plugin for Vite, injection script for reload/refresh, HMR dev-server
-- `i18n` - custom internationalization package; provides i18n function with type safety and other validation
-- `shared` - shared code for the entire project (types, constants, custom hooks, components etc.)
-- `storage` - helpers for easier integration with [storage](https://developer.chrome.com/docs/extensions/reference/api/storage), e.g. local/session storages
-- `tailwind-config` - shared Tailwind config for entire project
-- `tsconfig` - shared tsconfig for the entire project
-- `ui` - function to merge your Tailwind config with the global one; you can save components here
-- `vite-config` - shared Vite config for the entire project
-
-Other useful packages:
-
-- `zipper` - run `pnpm zip` to pack the `dist` folder into `extension-YYYYMMDD-HHmmss.zip` inside the newly created
-  `dist-zip`
-- `module-manager` - run `pnpm module-manager` to enable/disable modules
-- `e2e` - run `pnpm e2e` for end-to-end tests of your zipped extension on different browsers
-
-## Troubleshooting
-
-### Hot module reload seems to have frozen
-
-If saving source files doesn't cause the extension HMR code to trigger a reload of the browser page, try this:
-
-1. Ctrl+C the development server and restart it (`pnpm run dev`)
-2. If you get a [`grpc` error](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/issues/612),
-   [kill the
-   `turbo` process](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/issues/612#issuecomment-2518982339)
-   and run `pnpm dev` again.
-
-### Imports not resolving correctly
-
-If you are using WSL and imports are not resolving correctly, ensure that you have connected VS Code to WSL remotely using the [Remote - WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) extension.
-
-## Community
-
-To chat with other community members, you can join the [Discord](https://discord.gg/4ERQ6jgV9a) server.
-You can ask questions on that server, and you can also help others.
-
-Also, suggest new features or share any challenges you've faced while developing Chrome extensions!
-
-## Debugging
-
-If you're debugging one, you can use [Brie](https://go.briehq.com/github?utm_source=CEB) lets you capture screenshots, errors, and network activity, making it easier for us to help.
-
-## Reference
-
-- [Chrome Extensions](https://developer.chrome.com/docs/extensions)
-- [Vite Plugin](https://vitejs.dev/guide/api-plugin.html)
+# Tech Docs <a name="tech"></a>
+- [Vite](https://vitejs.dev/)
+- [Vite Plugins](https://vitejs.dev/guide/api-plugin.html)
+- [Chrome Extension with manifest 3](https://developer.chrome.com/docs/extensions/mv3/)
+- [Chrome Extension i18n](https://developer.chrome.com/docs/extensions/reference/api/i18n#description)
+- [Cross browser development with webextension-polyfill](https://github.com/mozilla/webextension-polyfill?tab=readme-ov-file#webextension-browser-api-polyfill)
+- [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - [Rollup](https://rollupjs.org/guide/en/)
-- [Turborepo](https://turbo.build/repo/docs)
-- [Rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
+- [Tailwind CSS 4](https://tailwindcss.com/docs/configuration)
 
-## Star History <a name="star-history"></a>
-
-<a href="https://star-history.com/#Jonghakseo/chrome-extension-boilerplate-react-vite&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Jonghakseo/chrome-extension-boilerplate-react-vite&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Jonghakseo/chrome-extension-boilerplate-react-vite&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Jonghakseo/chrome-extension-boilerplate-react-vite&type=Date" />
- </picture>
-</a>
-
-## Contributors <a name="contributors"></a>
-
-This Boilerplate is made possible thanks to all of its contributors.
-
-<a href="https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/graphs/contributors">
-  <img width="500px" src="https://contrib.rocks/image?repo=Jonghakseo/chrome-extension-boilerplate-react-vite" alt="All Contributors"/>
-</a>
-
----
-
-## Special Thanks To
-
-| <a href="https://jb.gg/OpenSourceSupport"><img width="40" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo."></a> | <a href="https://www.linkedin.com/in/j-acks0n"><img width="40" style="border-radius:50%" src='https://avatars.githubusercontent.com/u/23139754' alt='Jackson Hong'/></a> |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
----
-
-Made by [Jonghakseo](https://jonghakseo.github.io/)
+# Contributing <a name="contributing"></a>
+Feel free to open PRs or raise issues!
