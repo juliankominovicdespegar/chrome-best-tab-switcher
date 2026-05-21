@@ -15,6 +15,7 @@ export type RecentlyClosedItem = {
   title: string;
   url: string;
   lastModified?: number;
+  screenshot?: string;
 };
 
 export type HistoryItem = {
@@ -22,6 +23,7 @@ export type HistoryItem = {
   title: string;
   url: string;
   lastVisitTime: number;
+  screenshot?: string;
 };
 
 export type BackgroundRequest =

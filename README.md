@@ -50,7 +50,11 @@ bun run build:chrome
 
 ## Thumbnails
 
-Screenshots are captured with `chrome.tabs.captureVisibleTab` when you **activate** a tab. Tabs you have never focused since installing the extension show a favicon placeholder instead.
+Screenshots are captured with `chrome.tabs.captureVisibleTab` when you **activate** a tab. Each capture is stored in memory for the open tab and persisted in `chrome.storage.local`, keyed by the tab’s exact URL. Closing a tab does not delete its thumbnail—you’ll still see it under **Recently closed**, in history results, and when you reopen the same URL.
+
+Tabs you have never focused since installing the extension show a favicon placeholder instead. Restricted pages (`chrome://`, etc.) are not captured.
+
+Up to **100** URL thumbnails are kept; older entries are removed automatically (LRU by capture time) to stay within extension storage limits.
 
 ## Tech stack
 

@@ -4,7 +4,7 @@ import { initCommands } from './commands';
 import { initMessageHandler } from './messages';
 
 void initTracking();
-initScreenshots();
+void initScreenshots();
 initCommands();
 initMessageHandler();
 

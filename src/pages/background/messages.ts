@@ -6,25 +6,28 @@ import type {
   TabItem,
 } from '@src/lib/messages';
 import { getLastActiveAt } from './tracking';
-import { getScreenshot } from './screenshots';
+import { getScreenshotByUrl, getScreenshotForTab } from './screenshots';
 
 async function listTabs(): Promise<TabItem[]> {
   const tabs = await chrome.tabs.query({});
   const now = Date.now();
 
-  return tabs
-    .filter((tab): tab is chrome.tabs.Tab & { id: number } => tab.id != null)
-    .map((tab) => ({
-      id: tab.id,
-      windowId: tab.windowId,
-      title: tab.title || 'Untitled',
-      url: tab.url || '',
-      favIconUrl: tab.favIconUrl,
-      lastActiveAt: getLastActiveAt(tab.id) || (tab.active ? now : 0),
-      active: Boolean(tab.active),
-      screenshot: getScreenshot(tab.id),
-    }))
-    .sort((a, b) => b.lastActiveAt - a.lastActiveAt);
+  const items = await Promise.all(
+    tabs
+      .filter((tab): tab is chrome.tabs.Tab & { id: number } => tab.id != null)
+      .map(async (tab) => ({
+        id: tab.id,
+        windowId: tab.windowId,
+        title: tab.title || 'Untitled',
+        url: tab.url || '',
+        favIconUrl: tab.favIconUrl,
+        lastActiveAt: getLastActiveAt(tab.id) || (tab.active ? now : 0),
+        active: Boolean(tab.active),
+        screenshot: await getScreenshotForTab(tab.id),
+      })),
+  );
+
+  return items.sort((a, b) => b.lastActiveAt - a.lastActiveAt);
 }
 
 async function listRecentlyClosed(): Promise<RecentlyClosedItem[]> {
@@ -33,12 +36,14 @@ async function listRecentlyClosed(): Promise<RecentlyClosedItem[]> {
 
   for (const [index, session] of sessions.entries()) {
     if (session.tab) {
+      const url = session.tab.url || '';
       items.push({
         id: `${session.sessionId}-${index}`,
         sessionId: session.sessionId,
         title: session.tab.title || 'Untitled',
-        url: session.tab.url || '',
+        url,
         lastModified: session.tab.lastAccessed,
+        screenshot: getScreenshotByUrl(url),
       });
     }
   }
@@ -55,12 +60,16 @@ async function searchHistory(query: string): Promise<HistoryItem[]> {
 
   return results
     .filter((item) => item.url && !item.url.startsWith('chrome://'))
-    .map((item) => ({
-      id: String(item.id ?? item.url),
-      title: item.title || item.url || 'Untitled',
-      url: item.url!,
-      lastVisitTime: item.lastVisitTime ?? 0,
-    }));
+    .map((item) => {
+      const url = item.url!;
+      return {
+        id: String(item.id ?? url),
+        title: item.title || url || 'Untitled',
+        url,
+        lastVisitTime: item.lastVisitTime ?? 0,
+        screenshot: getScreenshotByUrl(url),
+      };
+    });
 }
 
 export function initMessageHandler() {
@@ -90,7 +99,7 @@ async function handleRequest(request: BackgroundRequest): Promise<BackgroundResp
     case 'GET_SCREENSHOT':
       return {
         type: 'GET_SCREENSHOT',
-        screenshot: getScreenshot(request.tabId),
+        screenshot: await getScreenshotForTab(request.tabId),
       };
 
     case 'ACTIVATE_TAB':

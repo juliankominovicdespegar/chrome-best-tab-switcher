@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X, Globe, ImageOff } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X, Globe, ImageOff } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -8,17 +8,17 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@src/components/ui/command';
-import { Button } from '@src/components/ui/button';
-import { formatTimeAgo } from '@src/lib/timeAgo';
+} from "@src/components/ui/command";
+import { Button } from "@src/components/ui/button";
+import { formatTimeAgo } from "@src/lib/timeAgo";
 import {
   sendToBackground,
   type HistoryItem,
   type RecentlyClosedItem,
   type TabItem,
-} from '@src/lib/messages';
-import { isLocalNetworkUrl } from '@src/lib/isLocalNetworkUrl';
-import { cn } from '@src/lib/utils';
+} from "@src/lib/messages";
+import { isLocalNetworkUrl } from "@src/lib/isLocalNetworkUrl";
+import { cn } from "@src/lib/utils";
 
 function safeImageUrl(url?: string): string | undefined {
   if (!url) return undefined;
@@ -36,11 +36,15 @@ function Favicon({ url, className }: { url?: string; className?: string }) {
       <img
         src={safeUrl}
         alt=""
-        className={cn('h-5 w-5 shrink-0 rounded-sm object-contain', className)}
+        className={cn("h-5 w-5 shrink-0 rounded-sm object-contain", className)}
       />
     );
   }
-  return <Globe className={cn('h-5 w-5 shrink-0 text-muted-foreground', className)} />;
+  return (
+    <Globe
+      className={cn("h-5 w-5 shrink-0 text-muted-foreground", className)}
+    />
+  );
 }
 
 function Thumbnail({ src, favIconUrl }: { src?: string; favIconUrl?: string }) {
@@ -49,13 +53,13 @@ function Thumbnail({ src, favIconUrl }: { src?: string; favIconUrl?: string }) {
       <img
         src={src}
         alt=""
-        className="h-20 w-36 shrink-0 rounded border border-border object-cover object-top bg-muted"
+        className="h-24 w-52 shrink-0 rounded border border-border object-cover object-top bg-muted"
       />
     );
   }
   const safeFavIcon = safeImageUrl(favIconUrl);
   return (
-    <div className="flex h-20 w-36 shrink-0 items-center justify-center rounded border border-border bg-muted">
+    <div className="flex h-24 w-52 shrink-0 items-center justify-center rounded border border-border bg-muted">
       {safeFavIcon ? (
         <img src={safeFavIcon} alt="" className="h-8 w-8 opacity-60" />
       ) : (
@@ -70,9 +74,11 @@ function closePopup() {
 }
 
 export default function Switcher() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [tabs, setTabs] = useState<TabItem[]>([]);
-  const [recentlyClosed, setRecentlyClosed] = useState<RecentlyClosedItem[]>([]);
+  const [recentlyClosed, setRecentlyClosed] = useState<RecentlyClosedItem[]>(
+    [],
+  );
   const [historyResults, setHistoryResults] = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -85,14 +91,15 @@ export default function Switcher() {
     setError(null);
     try {
       const [tabsRes, closedRes] = await Promise.all([
-        sendToBackground({ type: 'LIST_TABS' }),
-        sendToBackground({ type: 'LIST_RECENTLY_CLOSED' }),
+        sendToBackground({ type: "LIST_TABS" }),
+        sendToBackground({ type: "LIST_RECENTLY_CLOSED" }),
       ]);
-      if (tabsRes.type === 'LIST_TABS') setTabs(tabsRes.tabs);
-      if (closedRes.type === 'LIST_RECENTLY_CLOSED') setRecentlyClosed(closedRes.items);
+      if (tabsRes.type === "LIST_TABS") setTabs(tabsRes.tabs);
+      if (closedRes.type === "LIST_RECENTLY_CLOSED")
+        setRecentlyClosed(closedRes.items);
     } catch (err) {
-      console.warn('[tab-switcher]', err);
-      setError(err instanceof Error ? err.message : 'Failed to load tabs');
+      console.warn("[tab-switcher]", err);
+      setError(err instanceof Error ? err.message : "Failed to load tabs");
     } finally {
       setLoading(false);
     }
@@ -107,7 +114,9 @@ export default function Switcher() {
 
   const filteredTabs = useMemo(() => {
     if (!q) return tabs;
-    return tabs.filter((t) => matchesQuery(t.title, q) || matchesQuery(t.url, q));
+    return tabs.filter(
+      (t) => matchesQuery(t.title, q) || matchesQuery(t.url, q),
+    );
   }, [tabs, q]);
 
   const filteredClosed = useMemo(() => {
@@ -130,12 +139,12 @@ export default function Switcher() {
 
     setLoadingHistory(true);
     historyDebounceRef.current = setTimeout(() => {
-      void sendToBackground({ type: 'SEARCH_HISTORY', query: q })
+      void sendToBackground({ type: "SEARCH_HISTORY", query: q })
         .then((res) => {
-          if (res.type === 'SEARCH_HISTORY') setHistoryResults(res.items);
+          if (res.type === "SEARCH_HISTORY") setHistoryResults(res.items);
         })
         .catch((err) => {
-          console.warn('[tab-switcher]', err);
+          console.warn("[tab-switcher]", err);
         })
         .finally(() => setLoadingHistory(false));
     }, 150);
@@ -148,58 +157,63 @@ export default function Switcher() {
   const activateTab = async (tab: TabItem) => {
     try {
       await sendToBackground({
-        type: 'ACTIVATE_TAB',
+        type: "ACTIVATE_TAB",
         tabId: tab.id,
         windowId: tab.windowId,
       });
       closePopup();
     } catch (err) {
-      console.warn('[tab-switcher]', err);
-      setError(err instanceof Error ? err.message : 'Failed to activate tab');
+      console.warn("[tab-switcher]", err);
+      setError(err instanceof Error ? err.message : "Failed to activate tab");
     }
   };
 
   const closeTab = async (tabId: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
     try {
-      await sendToBackground({ type: 'CLOSE_TAB', tabId });
+      await sendToBackground({ type: "CLOSE_TAB", tabId });
       setTabs((prev) => prev.filter((t) => t.id !== tabId));
     } catch (err) {
-      console.warn('[tab-switcher]', err);
-      setError(err instanceof Error ? err.message : 'Failed to close tab');
+      console.warn("[tab-switcher]", err);
+      setError(err instanceof Error ? err.message : "Failed to close tab");
     }
   };
 
   const restoreSession = async (sessionId: string) => {
     try {
-      await sendToBackground({ type: 'RESTORE_SESSION', sessionId });
+      await sendToBackground({ type: "RESTORE_SESSION", sessionId });
       closePopup();
     } catch (err) {
-      console.warn('[tab-switcher]', err);
-      setError(err instanceof Error ? err.message : 'Failed to restore tab');
+      console.warn("[tab-switcher]", err);
+      setError(err instanceof Error ? err.message : "Failed to restore tab");
     }
   };
 
   const openHistoryUrl = async (url: string) => {
     try {
-      await sendToBackground({ type: 'OPEN_URL', url });
+      await sendToBackground({ type: "OPEN_URL", url });
       closePopup();
     } catch (err) {
-      console.warn('[tab-switcher]', err);
-      setError(err instanceof Error ? err.message : 'Failed to open URL');
+      console.warn("[tab-switcher]", err);
+      setError(err instanceof Error ? err.message : "Failed to open URL");
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       e.preventDefault();
       closePopup();
       return;
     }
 
-    if (e.key === 'Delete' || (e.key === 'Backspace' && (e.metaKey || e.ctrlKey))) {
-      const selected = document.querySelector('[cmdk-item][data-selected="true"]');
-      const tabId = selected?.getAttribute('data-tab-id');
+    if (
+      e.key === "Delete" ||
+      (e.key === "Backspace" && (e.metaKey || e.ctrlKey))
+    ) {
+      const selected = document.querySelector(
+        '[cmdk-item][data-selected="true"]',
+      );
+      const tabId = selected?.getAttribute("data-tab-id");
       if (tabId) {
         e.preventDefault();
         void closeTab(Number(tabId));
@@ -217,7 +231,11 @@ export default function Switcher() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-black/20 bg-neutral-50 shadow-2xl shadow-black/10">
-      <Command shouldFilter={false} onKeyDown={handleKeyDown} className="flex h-full flex-col bg-transparent">
+      <Command
+        shouldFilter={false}
+        onKeyDown={handleKeyDown}
+        className="flex h-full flex-col bg-transparent"
+      >
         <CommandInput
           ref={inputRef}
           placeholder="Search tabs by title or URL…"
@@ -226,11 +244,15 @@ export default function Switcher() {
         />
         <CommandList className="flex-1 max-h-none">
           {error && (
-            <div className="py-6 px-4 text-center text-sm text-destructive">{error}</div>
+            <div className="py-6 px-4 text-center text-sm text-destructive">
+              {error}
+            </div>
           )}
 
           {!error && loading && (
-            <div className="py-8 text-center text-sm text-muted-foreground">Loading tabs…</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              Loading tabs…
+            </div>
           )}
 
           {!error && !loading && filteredTabs.length > 0 && (
@@ -247,9 +269,11 @@ export default function Switcher() {
                   <Thumbnail src={tab.screenshot} favIconUrl={tab.favIconUrl} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{tab.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">{tab.url}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {tab.url}
+                    </p>
                     <p className="text-xs text-muted-foreground/80">
-                      {tab.lastActiveAt ? formatTimeAgo(tab.lastActiveAt) : '—'}
+                      {tab.lastActiveAt ? formatTimeAgo(tab.lastActiveAt) : "—"}
                     </p>
                   </div>
                   <Button
@@ -278,11 +302,15 @@ export default function Switcher() {
                     onSelect={() => void restoreSession(item.sessionId)}
                   >
                     <Globe className="h-5 w-5 shrink-0 text-muted-foreground" />
-                    <div className="h-14 w-24 shrink-0 rounded border border-dashed border-border bg-muted/50" />
+                    <Thumbnail src={item.screenshot} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{item.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">{item.url}</p>
-                      <p className="text-xs text-muted-foreground/80">Recently closed</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {item.url}
+                      </p>
+                      <p className="text-xs text-muted-foreground/80">
+                        Recently closed
+                      </p>
                     </div>
                   </CommandItem>
                 ))}
@@ -292,7 +320,9 @@ export default function Switcher() {
 
           {!error && showHistory && (
             <>
-              {(filteredTabs.length > 0 || filteredClosed.length > 0) && <CommandSeparator />}
+              {(filteredTabs.length > 0 || filteredClosed.length > 0) && (
+                <CommandSeparator />
+              )}
               <CommandGroup heading="History">
                 {loadingHistory && (
                   <div className="py-4 text-center text-xs text-muted-foreground">
@@ -307,12 +337,16 @@ export default function Switcher() {
                       onSelect={() => void openHistoryUrl(item.url)}
                     >
                       <Globe className="h-5 w-5 shrink-0 text-muted-foreground" />
-                      <div className="h-14 w-24 shrink-0 rounded border border-dashed border-border bg-muted/50" />
+                      <Thumbnail src={item.screenshot} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{item.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{item.url}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {item.url}
+                        </p>
                         <p className="text-xs text-muted-foreground/80">
-                          {item.lastVisitTime ? formatTimeAgo(item.lastVisitTime) : '—'}
+                          {item.lastVisitTime
+                            ? formatTimeAgo(item.lastVisitTime)
+                            : "—"}
                         </p>
                       </div>
                     </CommandItem>
@@ -321,7 +355,9 @@ export default function Switcher() {
             </>
           )}
 
-          {!error && isEmpty && <CommandEmpty>No matching tabs or pages.</CommandEmpty>}
+          {!error && isEmpty && (
+            <CommandEmpty>No matching tabs or pages.</CommandEmpty>
+          )}
         </CommandList>
       </Command>
     </div>
