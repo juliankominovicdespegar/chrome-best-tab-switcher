@@ -17,11 +17,13 @@ import {
   type RecentlyClosedItem,
   type TabItem,
 } from "@src/lib/messages";
+import { faviconUrlForPage, isExtensionFaviconUrl } from "@src/lib/faviconUrl";
 import { isLocalNetworkUrl } from "@src/lib/isLocalNetworkUrl";
 import { cn } from "@src/lib/utils";
 
 function safeImageUrl(url?: string): string | undefined {
   if (!url) return undefined;
+  if (isExtensionFaviconUrl(url)) return url;
   return isLocalNetworkUrl(url) ? undefined : url;
 }
 
@@ -297,14 +299,19 @@ export default function Switcher() {
             <>
               {filteredTabs.length > 0 && <CommandSeparator />}
               <CommandGroup heading="Recently closed">
-                {filteredClosed.map((item) => (
+                {filteredClosed.map((item) => {
+                  const favIconUrl = faviconUrlForPage(item.url);
+                  return (
                   <CommandItem
                     key={item.id}
                     value={item.id}
                     onSelect={() => void restoreSession(item.sessionId)}
                   >
-                    <Globe className="h-5 w-5 shrink-0 text-muted-foreground" />
-                    <Thumbnail src={item.screenshot} />
+                    <Favicon url={favIconUrl} />
+                    <Thumbnail
+                      src={item.screenshot}
+                      favIconUrl={favIconUrl}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{item.title}</p>
                       <p className="truncate text-xs text-muted-foreground">
@@ -315,7 +322,8 @@ export default function Switcher() {
                       </p>
                     </div>
                   </CommandItem>
-                ))}
+                  );
+                })}
               </CommandGroup>
             </>
           )}
@@ -332,14 +340,19 @@ export default function Switcher() {
                   </div>
                 )}
                 {!loadingHistory &&
-                  historyResults.map((item) => (
+                  historyResults.map((item) => {
+                    const favIconUrl = faviconUrlForPage(item.url);
+                    return (
                     <CommandItem
                       key={`history-${item.id}`}
                       value={`history-${item.id}`}
                       onSelect={() => void openHistoryUrl(item.url)}
                     >
-                      <Globe className="h-5 w-5 shrink-0 text-muted-foreground" />
-                      <Thumbnail src={item.screenshot} />
+                      <Favicon url={favIconUrl} />
+                      <Thumbnail
+                        src={item.screenshot}
+                        favIconUrl={favIconUrl}
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{item.title}</p>
                         <p className="truncate text-xs text-muted-foreground">
@@ -352,7 +365,8 @@ export default function Switcher() {
                         </p>
                       </div>
                     </CommandItem>
-                  ))}
+                    );
+                  })}
               </CommandGroup>
             </>
           )}

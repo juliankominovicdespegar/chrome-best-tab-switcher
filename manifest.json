@@ -13,6 +13,7 @@
   },
   "permissions": [
     "tabs",
+    "favicon",
     "history",
     "sessions",
     "storage",
