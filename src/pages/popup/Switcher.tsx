@@ -208,10 +208,7 @@ export default function Switcher() {
       return;
     }
 
-    if (
-      e.key === "Delete" ||
-      (e.key === "Backspace" && (e.metaKey || e.ctrlKey))
-    ) {
+    if (e.key === "Delete") {
       const selected = document.querySelector(
         '[cmdk-item][data-selected="true"]',
       );
@@ -302,26 +299,26 @@ export default function Switcher() {
                 {filteredClosed.map((item) => {
                   const favIconUrl = faviconUrlForPage(item.url);
                   return (
-                  <CommandItem
-                    key={item.id}
-                    value={item.id}
-                    onSelect={() => void restoreSession(item.sessionId)}
-                  >
-                    <Favicon url={favIconUrl} />
-                    <Thumbnail
-                      src={item.screenshot}
-                      favIconUrl={favIconUrl}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{item.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {item.url}
-                      </p>
-                      <p className="text-xs text-muted-foreground/80">
-                        Recently closed
-                      </p>
-                    </div>
-                  </CommandItem>
+                    <CommandItem
+                      key={item.id}
+                      value={item.id}
+                      onSelect={() => void restoreSession(item.sessionId)}
+                    >
+                      <Favicon url={favIconUrl} />
+                      <Thumbnail
+                        src={item.screenshot}
+                        favIconUrl={favIconUrl}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{item.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {item.url}
+                        </p>
+                        <p className="text-xs text-muted-foreground/80">
+                          Recently closed
+                        </p>
+                      </div>
+                    </CommandItem>
                   );
                 })}
               </CommandGroup>
@@ -343,28 +340,28 @@ export default function Switcher() {
                   historyResults.map((item) => {
                     const favIconUrl = faviconUrlForPage(item.url);
                     return (
-                    <CommandItem
-                      key={`history-${item.id}`}
-                      value={`history-${item.id}`}
-                      onSelect={() => void openHistoryUrl(item.url)}
-                    >
-                      <Favicon url={favIconUrl} />
-                      <Thumbnail
-                        src={item.screenshot}
-                        favIconUrl={favIconUrl}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">{item.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {item.url}
-                        </p>
-                        <p className="text-xs text-muted-foreground/80">
-                          {item.lastVisitTime
-                            ? formatTimeAgo(item.lastVisitTime)
-                            : "—"}
-                        </p>
-                      </div>
-                    </CommandItem>
+                      <CommandItem
+                        key={`history-${item.id}`}
+                        value={`history-${item.id}`}
+                        onSelect={() => void openHistoryUrl(item.url)}
+                      >
+                        <Favicon url={favIconUrl} />
+                        <Thumbnail
+                          src={item.screenshot}
+                          favIconUrl={favIconUrl}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium">{item.title}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {item.url}
+                          </p>
+                          <p className="text-xs text-muted-foreground/80">
+                            {item.lastVisitTime
+                              ? formatTimeAgo(item.lastVisitTime)
+                              : "—"}
+                          </p>
+                        </div>
+                      </CommandItem>
                     );
                   })}
               </CommandGroup>
