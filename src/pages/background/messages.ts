@@ -5,7 +5,7 @@ import type {
   RecentlyClosedItem,
   TabItem,
 } from '@src/lib/messages';
-import { getLastActiveAt } from './tracking';
+import { getLastVisitedAt } from './tracking';
 import { getScreenshotByUrl, getScreenshotForTab } from './screenshots';
 
 async function listTabs(): Promise<TabItem[]> {
@@ -21,13 +21,16 @@ async function listTabs(): Promise<TabItem[]> {
         title: tab.title || 'Untitled',
         url: tab.url || '',
         favIconUrl: tab.favIconUrl,
-        lastActiveAt: getLastActiveAt(tab.id) || (tab.active ? now : 0),
+        lastVisitedAt: getLastVisitedAt(tab.id) || (tab.active ? now : 0),
         active: Boolean(tab.active),
         screenshot: await getScreenshotForTab(tab.id),
       })),
   );
 
-  return items.sort((a, b) => b.lastActiveAt - a.lastActiveAt);
+  return items.sort((a, b) => {
+    if (a.active !== b.active) return a.active ? 1 : -1;
+    return b.lastVisitedAt - a.lastVisitedAt;
+  });
 }
 
 async function listRecentlyClosed(): Promise<RecentlyClosedItem[]> {

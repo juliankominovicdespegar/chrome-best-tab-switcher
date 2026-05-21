@@ -273,7 +273,9 @@ export default function Switcher() {
                       {tab.url}
                     </p>
                     <p className="text-xs text-muted-foreground/80">
-                      {tab.lastActiveAt ? formatTimeAgo(tab.lastActiveAt) : "—"}
+                      {tab.lastVisitedAt
+                        ? formatTimeAgo(tab.lastVisitedAt)
+                        : "—"}
                     </p>
                   </div>
                   <Button

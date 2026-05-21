@@ -4,7 +4,7 @@ export type TabItem = {
   title: string;
   url: string;
   favIconUrl?: string;
-  lastActiveAt: number;
+  lastVisitedAt: number;
   active: boolean;
   screenshot?: string;
 };
