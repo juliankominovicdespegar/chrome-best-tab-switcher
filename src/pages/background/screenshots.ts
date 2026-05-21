@@ -1,16 +1,18 @@
-const STORAGE_KEY = "urlScreenshots";
+import {
+  initThumbnailStore,
+  putThumbnail,
+  getThumbnailDataUrl,
+  getAllThumbnailUrls,
+  evictOldest,
+} from "@src/lib/thumbnailStore";
+
 const MAX_URL_SCREENSHOTS = 100;
 
-type UrlScreenshotEntry = {
-  dataUrl: string;
-  capturedAt: number;
-};
-
+// In-memory caches for fast synchronous reads during a SW lifetime
 const screenshotCache = new Map<number, string>();
-const urlScreenshotCache = new Map<string, UrlScreenshotEntry>();
+const urlScreenshotCache = new Map<string, { dataUrl: string; capturedAt: number }>();
 
 let captureTimer: ReturnType<typeof setTimeout> | null = null;
-let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingTabId: number | null = null;
 let pendingWindowId: number | null = null;
 
@@ -42,18 +44,28 @@ export function removeScreenshot(tabId: number) {
   screenshotCache.delete(tabId);
 }
 
-function persistForUrl(url: string, dataUrl: string) {
+async function persistForUrl(url: string, dataUrl: string) {
   if (!isPersistableUrl(url)) return;
-  urlScreenshotCache.set(url, { dataUrl, capturedAt: Date.now() });
-  scheduleFlush();
+
+  const capturedAt = Date.now();
+  urlScreenshotCache.set(url, { dataUrl, capturedAt });
+
+  try {
+    const blob = await fetch(dataUrl).then((r) => r.blob());
+    await putThumbnail(url, blob, capturedAt);
+  } catch (err) {
+    console.warn("[tab-switcher] Failed to persist thumbnail for", url, err);
+  }
+
+  if (urlScreenshotCache.size > MAX_URL_SCREENSHOTS) {
+    evictMemoryCache();
+    evictOldest().catch((err) =>
+      console.warn("[tab-switcher] eviction error", err),
+    );
+  }
 }
 
-function scheduleFlush() {
-  if (flushTimer) clearTimeout(flushTimer);
-  flushTimer = setTimeout(flushToStorage, 500);
-}
-
-function evictOldestEntries() {
+function evictMemoryCache() {
   if (urlScreenshotCache.size <= MAX_URL_SCREENSHOTS) return;
 
   const sorted = [...urlScreenshotCache.entries()].sort(
@@ -65,25 +77,13 @@ function evictOldestEntries() {
   }
 }
 
-async function flushToStorage() {
-  evictOldestEntries();
-  const record: Record<string, UrlScreenshotEntry> = {};
-  for (const [url, entry] of urlScreenshotCache) {
-    record[url] = entry;
-  }
-  await chrome.storage.local.set({ [STORAGE_KEY]: record });
-}
-
 export async function initScreenshots() {
-  const stored = await chrome.storage.local.get(STORAGE_KEY);
-  const record = (stored[STORAGE_KEY] ?? {}) as Record<
-    string,
-    UrlScreenshotEntry
-  >;
-  for (const [url, entry] of Object.entries(record)) {
-    if (entry?.dataUrl) {
-      urlScreenshotCache.set(url, entry);
-    }
+  await initThumbnailStore();
+
+  // Populate in-memory cache from IndexedDB
+  const stored = await getAllThumbnailUrls();
+  for (const [url, entry] of stored) {
+    urlScreenshotCache.set(url, entry);
   }
 
   chrome.tabs.onActivated.addListener((activeInfo) => {
@@ -120,7 +120,7 @@ async function capturePending() {
 
     const tab = await chrome.tabs.get(tabId);
     if (tab.url) {
-      persistForUrl(tab.url, dataUrl);
+      await persistForUrl(tab.url, dataUrl);
     }
   } catch {
     // Restricted pages or tab not ready — skip silently
