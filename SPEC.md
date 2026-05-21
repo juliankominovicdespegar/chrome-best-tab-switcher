@@ -34,8 +34,8 @@ Cubrir los problemas del tab switcher actual, manteniendo las cosas que me gusta
 - Apenas abra el popup con Ctrl+Shift+K (o clic en el ícono), se muestra el menú con las pestañas. Funciona en cualquier página, incluido chrome:// y PDFs.
 - El menu desplagble tendrá, describiendolo de arriba para abajo:
   - Un input para buscar por titulo o URL.
-    - El input buscará tambien en el historial de navegación, pero priorizará las tabs abiertas recientemente y las que están abiertas.
-    - Evaluar posibles problemas de performance al buscar en el historial de navegación, se puede evaluar incluso hacerlo lazy cuando no haya resultados de la búsqueda dentro de las tabs abiertas o recientes.
+    - El input buscará tambien en el historial de navegación, pero priorizará las tabs abiertas recientemente y las que están abiertas (orden de secciones: abiertas → cerradas recientemente → historial; el historial se muestra junto a resultados locales, no solo cuando no hay coincidencias locales).
+    - La búsqueda en historial va con debounce (~150 ms) para no penalizar performance al escribir.
   - La lista de tabs que coincidan con la búsqueda, donde cada tab tendrá:
     - Favicon
     - Miniatura

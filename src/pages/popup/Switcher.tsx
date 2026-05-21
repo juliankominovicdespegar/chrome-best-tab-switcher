@@ -31,6 +31,10 @@ function matchesQuery(text: string, query: string) {
   return text.toLowerCase().includes(query.toLowerCase());
 }
 
+function normalizeUrl(url: string) {
+  return url.trim().toLowerCase().replace(/#.*$/, "").replace(/\/$/, "");
+}
+
 function Favicon({ url, className }: { url?: string; className?: string }) {
   const safeUrl = safeImageUrl(url);
   if (safeUrl) {
@@ -87,6 +91,7 @@ export default function Switcher() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const historySearchIdRef = useRef(0);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -128,33 +133,57 @@ export default function Switcher() {
     );
   }, [recentlyClosed, q]);
 
-  const localMatchCount = filteredTabs.length + filteredClosed.length;
+  const localUrls = useMemo(() => {
+    const urls = new Set<string>();
+    for (const tab of filteredTabs) {
+      if (tab.url) urls.add(normalizeUrl(tab.url));
+    }
+    for (const item of filteredClosed) {
+      if (item.url) urls.add(normalizeUrl(item.url));
+    }
+    return urls;
+  }, [filteredTabs, filteredClosed]);
+
+  const filteredHistory = useMemo(() => {
+    return historyResults.filter(
+      (item) => item.url && !localUrls.has(normalizeUrl(item.url)),
+    );
+  }, [historyResults, localUrls]);
 
   useEffect(() => {
     if (historyDebounceRef.current) clearTimeout(historyDebounceRef.current);
 
-    if (!q || localMatchCount > 0) {
+    if (!q) {
+      historySearchIdRef.current += 1;
       setHistoryResults([]);
       setLoadingHistory(false);
       return;
     }
 
     setLoadingHistory(true);
+    const searchId = ++historySearchIdRef.current;
+    const searchQuery = q;
+
     historyDebounceRef.current = setTimeout(() => {
-      void sendToBackground({ type: "SEARCH_HISTORY", query: q })
+      void sendToBackground({ type: "SEARCH_HISTORY", query: searchQuery })
         .then((res) => {
+          if (searchId !== historySearchIdRef.current) return;
           if (res.type === "SEARCH_HISTORY") setHistoryResults(res.items);
         })
         .catch((err) => {
           console.warn("[tab-switcher]", err);
         })
-        .finally(() => setLoadingHistory(false));
+        .finally(() => {
+          if (searchId === historySearchIdRef.current) {
+            setLoadingHistory(false);
+          }
+        });
     }, 150);
 
     return () => {
       if (historyDebounceRef.current) clearTimeout(historyDebounceRef.current);
     };
-  }, [q, localMatchCount]);
+  }, [q]);
 
   const activateTab = async (tab: TabItem) => {
     try {
@@ -220,13 +249,14 @@ export default function Switcher() {
     }
   };
 
-  const showHistory = q.length > 0 && localMatchCount === 0;
+  const showHistory =
+    q.length > 0 && (loadingHistory || filteredHistory.length > 0);
   const isEmpty =
     !loading &&
     !error &&
     filteredTabs.length === 0 &&
     filteredClosed.length === 0 &&
-    (!showHistory || (!loadingHistory && historyResults.length === 0));
+    (q.length === 0 || (!loadingHistory && filteredHistory.length === 0));
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-black/20 bg-neutral-50 shadow-2xl shadow-black/10">
@@ -237,7 +267,7 @@ export default function Switcher() {
       >
         <CommandInput
           ref={inputRef}
-          placeholder="Search tabs by title or URL…"
+          placeholder="Search open tabs, recently closed, and history…"
           value={query}
           onValueChange={setQuery}
         />
@@ -337,7 +367,7 @@ export default function Switcher() {
                   </div>
                 )}
                 {!loadingHistory &&
-                  historyResults.map((item) => {
+                  filteredHistory.map((item) => {
                     const favIconUrl = faviconUrlForPage(item.url);
                     return (
                       <CommandItem
