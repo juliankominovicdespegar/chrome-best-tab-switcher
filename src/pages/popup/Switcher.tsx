@@ -281,12 +281,12 @@ export default function Switcher() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="shrink-0 opacity-0 group-hover:opacity-100 group-data-[selected=true]:opacity-100"
+                    className="shrink-0 opacity-0 group-hover:opacity-100 group-data-[selected=true]:opacity-100 rounded-[50%] hover:bg-black/10"
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={(e) => void closeTab(tab.id, e)}
                     aria-label="Close tab"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="size-5" />
                   </Button>
                 </CommandItem>
               ))}
