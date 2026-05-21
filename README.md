@@ -4,7 +4,7 @@ Fast Chrome tab switcher inspired by Raycast / Command-K. Search open tabs, rece
 
 ## Features
 
-- **Ctrl+Shift+K** (or **Cmd+Shift+K** on Mac) opens a centered overlay on the current page
+- **Ctrl+Shift+K** (or **Cmd+Shift+K** on Mac) opens the switcher popup (also click the extension icon)
 - Search by title or URL across open tabs and recently closed tabs
 - History search runs only when no open/recent matches are found (lazy, debounced)
 - Tab list sorted by last activity
@@ -18,20 +18,20 @@ Default: **Ctrl+Shift+K** (Windows/Linux) or **Cmd+Shift+K** (Mac).
 
 Chrome **does not allow** `Ctrl+Alt+*` in `manifest.json` (AltGr conflict), so `Ctrl+Alt+K` cannot be the built-in default. You can try rebinding manually at [chrome://extensions/shortcuts](chrome://extensions/shortcuts) — e.g. **Alt+Shift+K** is valid if you prefer Alt-based shortcuts.
 
-If the overlay does not open after install, confirm the binding under **Best Tab Switcher** → **Open tab switcher**.
+If the popup does not open after install, confirm the binding under **Best Tab Switcher** → **Open tab switcher**. Requires Chrome 127+ for opening the popup from the keyboard shortcut.
 
-## Where it works (and where it does not)
+## Where it works
 
-The UI is a **content script overlay**. It works on normal `http://` and `https://` pages.
+The UI runs in the **extension popup** (not injected into web pages). It works from **any** page, including:
 
-It **does not** run on:
-
-- `chrome://` pages (including the new tab page if it is a Chrome internal URL)
+- `chrome://` pages (settings, extensions, etc.)
 - Chrome Web Store
 - `file://` URLs
 - Built-in PDF viewer
 
-On those pages the shortcut does nothing (the background script cannot inject the overlay).
+Keyboard input stays inside the popup and does not reach the page behind it. Content Security Policy on websites no longer affects the switcher.
+
+The popup appears anchored to the extension icon in the toolbar (Chrome does not allow centering it on screen).
 
 ## Development
 
@@ -63,7 +63,7 @@ Screenshots are captured with `chrome.tabs.captureVisibleTab` when you **activat
 | Path | Role |
 |------|------|
 | `src/pages/background/` | Service worker: commands, tracking, screenshots, API handlers |
-| `src/pages/content/` | Overlay UI (Shadow DOM + React) |
+| `src/pages/popup/` | Tab switcher UI (React) |
 | `src/lib/messages.ts` | Typed `runtime.sendMessage` protocol |
 | `src/components/ui/` | shadcn-adapted Command + Button |
 

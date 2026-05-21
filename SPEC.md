@@ -21,8 +21,8 @@
 
 Cubrir los problemas del tab switcher actual, manteniendo las cosas que me gustan del tab switcher de Chrome actual.
 
-- Quiero hacer Ctrl+Shift+A para abrir el tab switcher que vamos a crear.
-- Lo quiero ver en el centro de la pantalla.
+- Quiero hacer Ctrl+Shift+K para abrir el tab switcher que vamos a crear.
+- La UI vive en el popup de la extensión (anclado al ícono de la toolbar; Chrome no permite centrarlo en pantalla).
 - Quiero velocidad por sobre todo, pero mantiendo simplicidad y en un grado un poquito menor la estética.
 - Quiero navegar por teclado y mouse.
 
@@ -31,7 +31,7 @@ Cubrir los problemas del tab switcher actual, manteniendo las cosas que me gusta
 - Se me ocurre algo parecido a Raycast o Command-K,
 - Usar React y Shadcn para la interfaz.
 - En el menú desplegable de las tabs quiero ver una lista de pestañas, con sus miniaturas, titulos y URLs y fecha de última actividad.
-- Apenas abra el desplegable haciendo CTRL+ALT+K, quiero que, de ser posible, en el centro de la pantalla se muestre el menú desplegable con las pestañas.
+- Apenas abra el popup con Ctrl+Shift+K (o clic en el ícono), se muestra el menú con las pestañas. Funciona en cualquier página, incluido chrome:// y PDFs.
 - El menu desplagble tendrá, describiendolo de arriba para abajo:
   - Un input para buscar por titulo o URL.
     - El input buscará tambien en el historial de navegación, pero priorizará las tabs abiertas recientemente y las que están abiertas.

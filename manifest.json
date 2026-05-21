@@ -16,8 +16,7 @@
     "history",
     "sessions",
     "storage",
-    "activeTab",
-    "scripting"
+    "activeTab"
   ],
   "host_permissions": [
     "http://*/*",
@@ -31,29 +30,5 @@
       },
       "description": "Open tab switcher"
     }
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "src/pages/content/index.tsx"
-      ],
-      "run_at": "document_start"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "icon-128.png",
-        "icon-32.png"
-      ],
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ]
-    }
-  ]
+  }
 }
