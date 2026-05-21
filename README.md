@@ -1,5 +1,7 @@
 # Best Tab Switcher
 
+Template from: https://github.com/JohnBra/vite-web-extension
+
 Fast Chrome tab switcher inspired by Raycast / Command-K. Search open tabs, recently closed tabs, and (lazily) browsing history.
 
 ## Features
@@ -64,11 +66,17 @@ Up to **100** URL thumbnails are kept; older entries are removed automatically (
 
 ## Project layout
 
-| Path | Role |
-|------|------|
+| Path                    | Role                                                          |
+| ----------------------- | ------------------------------------------------------------- |
 | `src/pages/background/` | Service worker: commands, tracking, screenshots, API handlers |
-| `src/pages/popup/` | Tab switcher UI (React) |
-| `src/lib/messages.ts` | Typed `runtime.sendMessage` protocol |
-| `src/components/ui/` | shadcn-adapted Command + Button |
+| `src/pages/popup/`      | Tab switcher UI (React)                                       |
+| `src/lib/messages.ts`   | Typed `runtime.sendMessage` protocol                          |
+| `src/components/ui/`    | shadcn-adapted Command + Button                               |
 
 See [SPEC.md](./SPEC.md) for product requirements.
+
+## Dev
+
+### Install
+
+### Compile
