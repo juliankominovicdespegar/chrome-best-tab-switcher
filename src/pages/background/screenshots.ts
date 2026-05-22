@@ -10,7 +10,10 @@ const MAX_URL_SCREENSHOTS = 100;
 
 // In-memory caches for fast synchronous reads during a SW lifetime
 const screenshotCache = new Map<number, string>();
-const urlScreenshotCache = new Map<string, { dataUrl: string; capturedAt: number }>();
+const urlScreenshotCache = new Map<
+  string,
+  { dataUrl: string; capturedAt: number }
+>();
 
 let captureTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingTabId: number | null = null;
@@ -113,7 +116,7 @@ async function capturePending() {
 
   try {
     const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
-      format: "jpeg",
+      format: "png",
       quality: 1,
     });
     screenshotCache.set(tabId, dataUrl);

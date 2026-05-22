@@ -258,6 +258,18 @@ export default function Switcher() {
     filteredClosed.length === 0 &&
     (q.length === 0 || (!loadingHistory && filteredHistory.length === 0));
 
+  const commandListKey = useMemo(
+    () =>
+      [
+        q,
+        filteredTabs.map((t) => t.id).join(","),
+        filteredClosed.map((c) => c.id).join(","),
+        filteredHistory.map((h) => h.id).join(","),
+        loadingHistory,
+      ].join("|"),
+    [q, filteredTabs, filteredClosed, filteredHistory, loadingHistory],
+  );
+
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-black/20 bg-neutral-50 shadow-2xl shadow-black/10">
       <Command
@@ -271,7 +283,7 @@ export default function Switcher() {
           value={query}
           onValueChange={setQuery}
         />
-        <CommandList className="flex-1 max-h-none">
+        <CommandList key={commandListKey} className="flex-1 max-h-none">
           {error && (
             <div className="py-6 px-4 text-center text-sm text-destructive">
               {error}
@@ -288,8 +300,9 @@ export default function Switcher() {
             <CommandGroup heading="Open tabs">
               {filteredTabs.map((tab) => (
                 <CommandItem
-                  key={`tab-${tab.id}`}
-                  value={`tab-${tab.id}`}
+                  key={`open-${tab.id}`}
+                  value={`open-${tab.id}`}
+                  keywords={[tab.title, tab.url]}
                   data-tab-id={tab.id}
                   onSelect={() => void activateTab(tab)}
                   className="group"
@@ -330,8 +343,9 @@ export default function Switcher() {
                   const favIconUrl = faviconUrlForPage(item.url);
                   return (
                     <CommandItem
-                      key={item.id}
-                      value={item.id}
+                      key={`closed-${item.id}`}
+                      value={`closed-${item.id}`}
+                      keywords={[item.title, item.url]}
                       onSelect={() => void restoreSession(item.sessionId)}
                     >
                       <Favicon url={favIconUrl} />
@@ -373,6 +387,7 @@ export default function Switcher() {
                       <CommandItem
                         key={`history-${item.id}`}
                         value={`history-${item.id}`}
+                        keywords={[item.title, item.url]}
                         onSelect={() => void openHistoryUrl(item.url)}
                       >
                         <Favicon url={favIconUrl} />

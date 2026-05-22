@@ -39,10 +39,13 @@ async function listRecentlyClosed(): Promise<RecentlyClosedItem[]> {
 
   for (const [index, session] of sessions.entries()) {
     if (session.tab) {
+      const sessionId = session.tab.sessionId;
+      if (!sessionId) continue;
+
       const url = session.tab.url || '';
       items.push({
-        id: `${session.sessionId}-${index}`,
-        sessionId: session.sessionId,
+        id: `${sessionId}-${index}`,
+        sessionId,
         title: session.tab.title || 'Untitled',
         url,
         lastModified: session.tab.lastAccessed,
